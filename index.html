@@ -19,9 +19,6 @@
         </a>
 
         <div class="header-actions">
-          <button class="nav-link-info" id="serverConfigBtn" style="cursor:pointer; background: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.3);">
-            ⚙ Server Config
-          </button>
           <a href="info.html" class="nav-link-info" id="infoLink">
             Directory Index
           </a>
@@ -42,16 +39,6 @@
         </div>
       </div>
     </header>
-
-    <!-- Server Config Bar (collapsible) -->
-    <div id="serverConfigBar" class="server-config-bar" style="display: none;">
-      <div class="config-container">
-        <label for="serverUrlInput">Media Server URL:</label>
-        <input type="text" id="serverUrlInput" class="config-input" placeholder="e.g. https://xxxx.ngrok-free.app/" />
-        <button id="saveServerUrlBtn" class="btn btn-primary btn-sm">Save</button>
-        <button id="resetServerUrlBtn" class="btn btn-secondary btn-sm">Reset</button>
-      </div>
-    </div>
 
     <!-- Dynamic Hero Banner -->
     <section class="hero" id="heroSection">
@@ -184,21 +171,7 @@
     <!-- Scripting and UI logic -->
     <script>
       const API_URL = "movies.json";
-      
-      // Read configured media server URL from localStorage, defaulting to local IP
-      let STREAM_BASE_URL = localStorage.getItem("streamBaseUrl") || "http://172.16.172.166:8088/";
-      if (!STREAM_BASE_URL.endsWith("/")) {
-        STREAM_BASE_URL += "/";
-      }
-
-      // Helper to replace the local IP URL prefix with the user's custom stream endpoint
-      function resolveMovieUrl(url) {
-        if (!url) return "";
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-          return STREAM_BASE_URL + url;
-        }
-        return url.replace(/^http:\/\/172\.16\.172\.166:8088\//, STREAM_BASE_URL);
-      }
+      const STREAM_BASE_URL = "http://172.16.172.166:8088/";
 
       // DOM Elements
       const movieGrid = document.getElementById("movieGrid");
@@ -538,7 +511,7 @@
 
         if (movie.video && movie.video.trim() !== "") {
           // Play stream
-          player.src = resolveMovieUrl(movie.video);
+          player.src = movie.video;
           player.style.display = "block";
           fallbackPlayer.style.display = "none";
         } else {
@@ -630,48 +603,6 @@
         if (e.target === document.getElementById("modal")) {
           closeModal();
         }
-      });
-
-      // Server Config Panel Interactivity
-      const serverConfigBtn = document.getElementById("serverConfigBtn");
-      const serverConfigBar = document.getElementById("serverConfigBar");
-      const serverUrlInput = document.getElementById("serverUrlInput");
-
-      // Initialize input field
-      serverUrlInput.value = STREAM_BASE_URL;
-
-      // Toggle configuration panel
-      serverConfigBtn.addEventListener("click", () => {
-        const isHidden = serverConfigBar.style.display === "none";
-        serverConfigBar.style.display = isHidden ? "block" : "none";
-        if (isHidden) {
-          serverUrlInput.focus();
-        }
-      });
-
-      // Save new media server URL
-      document.getElementById("saveServerUrlBtn").addEventListener("click", () => {
-        let inputVal = serverUrlInput.value.trim();
-        if (!inputVal) {
-          alert("Please enter a valid URL");
-          return;
-        }
-        if (!inputVal.endsWith("/")) {
-          inputVal += "/";
-        }
-        STREAM_BASE_URL = inputVal;
-        localStorage.setItem("streamBaseUrl", STREAM_BASE_URL);
-        alert("Media Server URL saved successfully! Reloading catalog...");
-        location.reload();
-      });
-
-      // Reset media server URL to default
-      document.getElementById("resetServerUrlBtn").addEventListener("click", () => {
-        STREAM_BASE_URL = "http://172.16.172.166:8088/";
-        localStorage.removeItem("streamBaseUrl");
-        serverUrlInput.value = STREAM_BASE_URL;
-        alert("Media Server URL reset to default! Reloading catalog...");
-        location.reload();
       });
 
       // Init on window load
