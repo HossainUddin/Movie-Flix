@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MovieFlix - Watch Movies Online</title>
+    <meta name="description" content="Browse and watch your favorite movies online. Stream movies directly from your catalog with an elegant, responsive interface." />
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    
+    <!-- Sticky Header -->
+    <header class="main-header">
+      <div class="header-container">
+        <a href="#" class="logo" id="logoLink">
+          Movie<span>Flix</span>
+        </a>
+
+        <div class="header-actions">
+          <a href="info.html" class="nav-link-info" id="infoLink">
+            Directory Index
+          </a>
+          
+          <div class="search-wrapper">
+            <!-- Search Icon -->
+            <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              id="search"
+              placeholder="Search movies..."
+              class="search-input"
+              aria-label="Search movies"
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dynamic Hero Banner -->
+    <section class="hero" id="heroSection">
+      <div id="heroBackdrop" class="hero-backdrop"></div>
+      <div class="hero-container">
+        <div class="hero-content">
+          <span class="hero-tag" id="heroTag">
+            ★ Featured Pick
+          </span>
+          <h2 class="hero-title" id="heroTitle">
+            Watch Movies Online
+          </h2>
+          <p class="hero-desc" id="heroDesc">
+            Browse through thousands of films in high quality. Start streaming now from your local media server.
+          </p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary" id="heroPlayBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              Watch Trailer
+            </button>
+            <button class="btn btn-secondary" id="heroDetailsBtn">
+              More Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section" id="catalogStart">
+      <div class="filter-bar">
+        <div class="filter-categories" id="filterCategories">
+          <button class="category-tab active" data-filter="all">All Movies</button>
+          <button class="category-tab" data-filter="latest">Latest (2024+)</button>
+          <button class="category-tab" data-filter="2020s">2020s</button>
+          <button class="category-tab" data-filter="2010s">2010s</button>
+          <button class="category-tab" data-filter="2000s">2000s</button>
+          <button class="category-tab" data-filter="classic">Classic (&lt;2000)</button>
+        </div>
+        <div class="filter-stats" id="filterStats">
+          Loading catalog...
+        </div>
+      </div>
+    </section>
+
+    <!-- Movies Grid Section -->
+    <main class="catalog-section">
+      <div id="movieGrid" class="movie-grid">
+        <!-- Rendered movie cards will appear here -->
+      </div>
+
+      <!-- Pagination Container -->
+      <div class="pagination-container" id="paginationContainer" style="display: none;">
+        <div class="pagination-controls-row">
+          <div class="pagination-info" id="paginationInfo">
+            Showing 0-0 of 0 movies
+          </div>
+          
+          <div class="pagination-pages" id="paginationPages">
+            <!-- Dynamic page buttons -->
+          </div>
+
+          <div class="page-size-selector">
+            <label for="pageSizeSelect">Show:</label>
+            <select id="pageSizeSelect" class="page-size-select" aria-label="Movies per page">
+              <option value="10">10 per page</option>
+              <option value="12" selected>12 per page</option>
+              <option value="20">20 per page</option>
+              <option value="40">40 per page</option>
+              <option value="100">100 per page</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Cinema Movie Details & Play Modal -->
+    <div id="modal" class="modal-overlay" aria-hidden="true" role="dialog">
+      <div class="modal-container">
+        
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h3 id="movieTitle" class="modal-title">Movie Title</h3>
+          <button onclick="closeModal()" class="modal-close-btn" aria-label="Close movie player">
+            Close
+          </button>
+        </div>
+
+        <!-- Modal Body (Video or Fallback) -->
+        <div class="modal-body">
+          <div class="video-player-container">
+            
+            <!-- Web video tag -->
+            <video id="player" controls class="video-element"></video>
+            
+            <!-- Premium Fallback Stream Overlay -->
+            <div id="fallbackPlayer" class="fallback-player-card">
+              <svg class="fallback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-19.5 0A2.25 2.25 0 002.25 15v2.25a2.25 2.25 0 002.25 2.25h15a2.25 2.25 0 002.25-2.25V15a2.25 2.25 0 00-2.25-2.25m-19.5 0h19.5" />
+              </svg>
+              <h4 class="fallback-title">Stream Source Unavailable</h4>
+              <p class="fallback-text">
+                Direct MP4 stream link is not available for this movie. You can open its directory on the media server to play or download the file.
+              </p>
+              <a id="fallbackFolderLink" href="#" target="_blank" class="btn btn-primary">
+                Browse Media Folder
+              </a>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- Modal Footer Info -->
+        <div class="modal-footer-details">
+          <div class="metadata-pills" id="modalMetadata">
+            <!-- Year and IMDb/TMDb pills will go here -->
+          </div>
+          <div class="modal-actions-row">
+            <a id="modalFolderShortcut" href="#" target="_blank" class="btn btn-secondary">
+              Open File Location
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Scripting and UI logic -->
+    <script>
+      const API_URL = "movies.json";
+      const STREAM_BASE_URL = "http://172.16.172.166:8088/";
+
+      // DOM Elements
+      const movieGrid = document.getElementById("movieGrid");
+      const searchInput = document.getElementById("search");
+      const filterCategories = document.getElementById("filterCategories");
+      const filterStats = document.getElementById("filterStats");
+      const paginationContainer = document.getElementById("paginationContainer");
+      const paginationInfo = document.getElementById("paginationInfo");
+      const paginationPages = document.getElementById("paginationPages");
+      const pageSizeSelect = document.getElementById("pageSizeSelect");
+      
+      const heroSection = document.getElementById("heroSection");
+      const heroBackdrop = document.getElementById("heroBackdrop");
+      const heroTitle = document.getElementById("heroTitle");
+      const heroDesc = document.getElementById("heroDesc");
+      const heroPlayBtn = document.getElementById("heroPlayBtn");
+      const heroDetailsBtn = document.getElementById("heroDetailsBtn");
+
+      // Application State
+      let movies = [];
+      let filteredMovies = [];
+      let currentPage = 1;
+      let pageSize = 12;
+      let activeFilter = "all";
+      let featuredMovie = null;
+
+      // Extract year from title e.g. "Alive (2020)" -> 2020
+      function extractYear(title) {
+        const match = title.match(/\((\d{4})\)/);
+        return match ? parseInt(match[1]) : null;
+      }
+
+      // Clean year text out of title
+      function cleanTitle(title) {
+        return title.replace(/\s*\(\d{4}\)\s*/, "").trim();
+      }
+
+      // Extract IMDb and TMDb tags from link
+      function extractMetaTags(link) {
+        try {
+          const decoded = decodeURIComponent(link);
+          const imdbMatch = decoded.match(/imdb-([^\]]+)/);
+          const tmdbMatch = decoded.match(/tmdb-([^\]]+)/);
+          return {
+            imdb: imdbMatch ? imdbMatch[1] : null,
+            tmdb: tmdbMatch ? tmdbMatch[1] : null
+          };
+        } catch (e) {
+          return { imdb: null, tmdb: null };
+        }
+      }
+
+      // Construct stream/folder URL
+      function constructFolderUrl(link) {
+        return STREAM_BASE_URL + link;
+      }
+
+      // Fetch all movies
+      async function loadMovies() {
+        try {
+          filterStats.textContent = "Loading catalog database...";
+          const res = await fetch(API_URL);
+          if (!res.ok) throw new Error("Network response error");
+          movies = await res.json();
+          
+          // Fallback if data format issue
+          if (!Array.isArray(movies)) {
+            movies = [];
+          }
+
+          // Filter out entries with invalid/empty titles
+          movies = movies.filter(m => m.title && m.title.trim() !== "");
+
+          // Select a random movie to feature in the Hero section on load
+          selectFeaturedMovie();
+
+          // Apply initial filters
+          applyFilters();
+        } catch (err) {
+          console.error("Error loading movie catalog:", err);
+          movieGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #ef4444;">
+              <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Failed to load Movie Catalog</h3>
+              <p style="color: #94a3b8;">Please verify that movies.json is available and correct.</p>
+            </div>
+          `;
+          filterStats.textContent = "Connection failed";
+        }
+      }
+
+      // Select featured movie for Hero pick
+      function selectFeaturedMovie() {
+        if (movies.length === 0) return;
+        
+        // Find movies that have poster links and clean titles
+        const candidates = movies.filter(m => m.poster && m.poster.startsWith("http"));
+        const selectionSource = candidates.length > 0 ? candidates : movies;
+        
+        // Select random candidate
+        const randomIndex = Math.floor(Math.random() * selectionSource.length);
+        featuredMovie = selectionSource[randomIndex];
+
+        if (featuredMovie) {
+          heroBackdrop.style.backgroundImage = `url('${featuredMovie.poster}')`;
+          heroTitle.textContent = cleanTitle(featuredMovie.title);
+          
+          const year = extractYear(featuredMovie.title);
+          const meta = extractMetaTags(featuredMovie.link);
+          
+          let descText = `Featured pick for today. `;
+          if (year) descText += `Released in ${year}. `;
+          if (meta.imdb) descText += `IMDb Reference: ${meta.imdb}. `;
+          descText += `Stream online or explore the directories directly on our local server.`;
+          
+          heroDesc.textContent = descText;
+
+          // Wire play & detail buttons to play this featured movie
+          heroPlayBtn.onclick = () => playMovie(featuredMovie);
+          heroDetailsBtn.onclick = () => playMovie(featuredMovie);
+        }
+      }
+
+      // Filter catalog based on active filter button and search input text
+      function applyFilters() {
+        const searchVal = searchInput.value.toLowerCase().trim();
+
+        filteredMovies = movies.filter(movie => {
+          // Search Title
+          const matchesSearch = movie.title.toLowerCase().includes(searchVal);
+          if (!matchesSearch) return false;
+
+          // Filter Category (by year range)
+          if (activeFilter === "all") return true;
+
+          const year = extractYear(movie.title);
+          if (!year) {
+            // Unspecified years show up in Classic tab as catch-all
+            return activeFilter === "classic";
+          }
+
+          if (activeFilter === "latest") return year >= 2024;
+          if (activeFilter === "2020s") return year >= 2020 && year <= 2023;
+          if (activeFilter === "2010s") return year >= 2010 && year <= 2019;
+          if (activeFilter === "2000s") return year >= 2000 && year <= 2009;
+          if (activeFilter === "classic") return year < 2000;
+
+          return true;
+        });
+
+        currentPage = 1; // Reset to page 1 on filter/search change
+        renderGrid();
+      }
+
+      // Render grid view with client side slicing
+      function renderGrid() {
+        movieGrid.innerHTML = "";
+
+        const totalItems = filteredMovies.length;
+        filterStats.textContent = `Found ${totalItems.toLocaleString()} movie${totalItems === 1 ? "" : "s"}`;
+
+        if (totalItems === 0) {
+          movieGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1.5rem; background: rgba(13, 18, 33, 0.4); border-radius: 1.5rem; border: 1px dashed rgba(255,255,255,0.08);">
+              <svg style="width: 3.5rem; height: 3.5rem; color: #64748b; margin-bottom: 1rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 style="font-size: 1.25rem; font-weight:600; margin-bottom: 0.25rem; color: #fff;">No matching movies found</h3>
+              <p style="color: #64748b; font-size: 0.95rem;">Try adjusting your keywords or clearing the search query.</p>
+            </div>
+          `;
+          paginationContainer.style.display = "none";
+          return;
+        }
+
+        // Slice current page
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize, totalItems);
+        const paginatedSlice = filteredMovies.slice(startIndex, endIndex);
+
+        // Display page slice items
+        paginatedSlice.forEach(movie => {
+          const year = extractYear(movie.title) || "N/A";
+          const titleText = cleanTitle(movie.title);
+          const meta = extractMetaTags(movie.link);
+          
+          let metaBadgeHtml = "";
+          if (meta.imdb) {
+            metaBadgeHtml = `<span class="card-badge-left">IMDb</span>`;
+          } else if (meta.tmdb) {
+            metaBadgeHtml = `<span class="card-badge-left">TMDb</span>`;
+          }
+
+          // Handle poster image fallback
+          const posterUrl = movie.poster && movie.poster.startsWith("http") 
+            ? movie.poster 
+            : "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=350&auto=format&fit=crop";
+
+          const cardHtml = `
+            <div class="movie-card" onclick="openMovieDetails(${movies.indexOf(movie)})">
+              <div class="card-poster-wrapper">
+                ${metaBadgeHtml}
+                <span class="card-badge">${year}</span>
+                <img src="${posterUrl}" alt="${titleText}" class="card-poster" loading="lazy">
+                <div class="card-overlay">
+                  <div class="play-icon-glow">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="card-info">
+                <h3 class="card-title" title="${movie.title}">${titleText}</h3>
+                <div class="card-meta">
+                  <span>${year}</span>
+                  ${meta.imdb ? `<span>•</span> <span>HD</span>` : ""}
+                </div>
+              </div>
+            </div>
+          `;
+          movieGrid.insertAdjacentHTML("beforeend", cardHtml);
+        });
+
+        // Show/Update Pagination Controls
+        paginationContainer.style.display = "block";
+        updatePaginationBar(totalItems, startIndex + 1, endIndex);
+      }
+
+      // Generate pagination controls buttons
+      function updatePaginationBar(totalItems, showStart, showEnd) {
+        paginationInfo.textContent = `Showing ${showStart.toLocaleString()}-${showEnd.toLocaleString()} of ${totalItems.toLocaleString()} titles`;
+
+        const totalPages = Math.ceil(totalItems / pageSize);
+        paginationPages.innerHTML = "";
+
+        // Previous button
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "page-btn";
+        prevBtn.innerHTML = "&laquo; Prev";
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => navigateToPage(currentPage - 1);
+        paginationPages.appendChild(prevBtn);
+
+        // Calculate page window (Max 7 buttons)
+        const maxPagesToShow = 5;
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+        if (endPage - startPage < maxPagesToShow - 1) {
+          startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+
+        // First page shortcut if hidden
+        if (startPage > 1) {
+          addPageButton(1);
+          if (startPage > 2) {
+            const ellipsis = document.createElement("span");
+            ellipsis.className = "page-ellipsis";
+            ellipsis.textContent = "...";
+            paginationPages.appendChild(ellipsis);
+          }
+        }
+
+        // Render page number buttons
+        for (let i = startPage; i <= endPage; i++) {
+          addPageButton(i);
+        }
+
+        // Last page shortcut if hidden
+        if (endPage < totalPages) {
+          if (endPage < totalPages - 1) {
+            const ellipsis = document.createElement("span");
+            ellipsis.className = "page-ellipsis";
+            ellipsis.textContent = "...";
+            paginationPages.appendChild(ellipsis);
+          }
+          addPageButton(totalPages);
+        }
+
+        // Next button
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "page-btn";
+        nextBtn.innerHTML = "Next &raquo;";
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => navigateToPage(currentPage + 1);
+        paginationPages.appendChild(nextBtn);
+      }
+
+      // Render single page number button
+      function addPageButton(pageNumber) {
+        const btn = document.createElement("button");
+        btn.className = `page-btn ${currentPage === pageNumber ? "active" : ""}`;
+        btn.textContent = pageNumber;
+        btn.onclick = () => navigateToPage(pageNumber);
+        paginationPages.appendChild(btn);
+      }
+
+      // Page Navigator Action
+      function navigateToPage(targetPage) {
+        currentPage = targetPage;
+        renderGrid();
+        
+        // Smooth scroll to catalog section top
+        const targetElement = document.getElementById("catalogStart");
+        const offset = 90; // offset for sticky header
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = targetElement.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition - offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+
+      // Open Movie details by index lookup
+      function openMovieDetails(originalIndex) {
+        const movie = movies[originalIndex];
+        if (movie) playMovie(movie);
+      }
+
+      // Play / Detail Modal display
+      function playMovie(movie) {
+        const titleText = cleanTitle(movie.title);
+        document.getElementById("movieTitle").textContent = titleText;
+
+        const player = document.getElementById("player");
+        const fallbackPlayer = document.getElementById("fallbackPlayer");
+        const fallbackFolderLink = document.getElementById("fallbackFolderLink");
+        
+        const folderUrl = constructFolderUrl(movie.link);
+
+        // Reset video player sources
+        player.pause();
+        player.src = "";
+
+        if (movie.video && movie.video.trim() !== "") {
+          // Play stream
+          player.src = movie.video;
+          player.style.display = "block";
+          fallbackPlayer.style.display = "none";
+        } else {
+          // Empty video stream -> Show media folder fallback
+          player.style.display = "none";
+          fallbackPlayer.style.display = "flex";
+          fallbackFolderLink.href = folderUrl;
+        }
+
+        // Build Metadata Pills in Modal footer
+        const modalMetadata = document.getElementById("modalMetadata");
+        modalMetadata.innerHTML = "";
+
+        const year = extractYear(movie.title);
+        if (year) {
+          modalMetadata.insertAdjacentHTML("beforeend", `<span class="metadata-pill accent-primary">${year}</span>`);
+        }
+
+        const meta = extractMetaTags(movie.link);
+        if (meta.imdb) {
+          modalMetadata.insertAdjacentHTML(
+            "beforeend", 
+            `<a href="https://www.imdb.com/title/${meta.imdb}" target="_blank" class="metadata-pill accent-db" style="text-decoration:none;">IMDb: ${meta.imdb}</a>`
+          );
+        }
+        if (meta.tmdb) {
+          modalMetadata.insertAdjacentHTML(
+            "beforeend", 
+            `<a href="https://www.themoviedb.org/movie/${meta.tmdb}" target="_blank" class="metadata-pill accent-db" style="text-decoration:none;">TMDb: ${meta.tmdb}</a>`
+          );
+        }
+
+        // Set action shortcuts
+        document.getElementById("modalFolderShortcut").href = folderUrl;
+
+        // Show Modal
+        const modal = document.getElementById("modal");
+        modal.style.display = "flex";
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden"; // Prevent background body scroll
+      }
+
+      // Close modal details
+      function closeModal() {
+        const player = document.getElementById("player");
+        player.pause();
+        player.src = "";
+
+        const modal = document.getElementById("modal");
+        modal.style.display = "none";
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = ""; // Re-enable background scrolling
+      }
+
+      // Event Listeners Setup
+      searchInput.addEventListener("input", () => {
+        applyFilters();
+      });
+
+      pageSizeSelect.addEventListener("change", () => {
+        pageSize = parseInt(pageSizeSelect.value) || 12;
+        currentPage = 1;
+        renderGrid();
+      });
+
+      // Handle category filtering clicks
+      filterCategories.addEventListener("click", (e) => {
+        if (e.target.classList.contains("category-tab")) {
+          // Remove active classes
+          const tabs = filterCategories.querySelectorAll(".category-tab");
+          tabs.forEach(tab => tab.classList.remove("active"));
+
+          // Set clicked active
+          e.target.classList.add("active");
+          activeFilter = e.target.dataset.filter || "all";
+          
+          applyFilters();
+        }
+      });
+
+      // Close modal on escape press or clicking outside the container
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && document.getElementById("modal").style.display === "flex") {
+          closeModal();
+        }
+      });
+
+      document.getElementById("modal").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("modal")) {
+          closeModal();
+        }
+      });
+
+      // Init on window load
+      loadMovies();
+    </script>
+  </body>
+</html>
